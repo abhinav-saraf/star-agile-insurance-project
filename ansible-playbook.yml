@@ -1,20 +1,25 @@
-- name : Configure Docker on EC2 Instances
-  hosts : all
+---
+- name: Configure and deploy InsureMe app
+  hosts: all
   become: true
-  connection : ssh
-  tasks : 
-  - name: updating apt
-    command : sudo apt-get update
+  tasks:
+    - name: Install Docker
+      apt:
+        name: ['docker.io']
+        state: present
+        update_cache: yes
 
-  - name : Install Docker
-    command : sudo apt-get install -y docker.io
-    become : yes
-    become_user : root
+    - name: Start Docker
+      systemd:
+        name: docker
+        enabled: true
+        state: started
 
-  - name : Start Docker Service
-    command : sudo systemctl start docker
-    become : yes
-    become_user : root
+    - name: Pull Docker Image
+      shell: docker pull sarafabhinav1997/insureme-app:latest
 
-  - name: Deploy Docker Container
-    command: docker run -itd -p 8084:8081 shubhamkushwah123/insure-me:3.0
+    - name: Stop existing container if running
+      shell: docker stop insureme || true && docker rm -f insureme || true
+
+    - name: Run container
+      shell: docker run -d -p 8084:8081 --name insureme sarafabhinav1997/financeme-app:latest
