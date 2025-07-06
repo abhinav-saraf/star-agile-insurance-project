@@ -19,7 +19,7 @@
       shell: docker pull sarafabhinav1997/insureme-app:latest
 
     - name: Stop existing container if running
-      shell: docker stop insureme-app || true && docker rm -f insureme || true
+      shell: docker stop insureme || true && docker rm -f insureme || true
 
     - name: Run container
       shell: docker run -d -p 8084:8081 --name insureme sarafabhinav1997/insureme-app:latest
