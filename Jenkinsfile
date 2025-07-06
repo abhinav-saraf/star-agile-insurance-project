@@ -2,65 +2,61 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "insuranceme-app"
-        DOCKERHUB_USER = "sarafabhinav1997"
+        IMAGE_NAME = "insureme-app"
+        TEST_SERVER = "ubuntu@<test-server-ip>"
+        PROD_SERVER = "ubuntu@<prod-server-ip>"
+        PRIVATE_KEY = credentials('ec2-ssh-key')
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 git 'https://github.com/abhinav-saraf/star-agile-insurance-project.git'
             }
         }
 
-        stage('Build with Maven') {
+        stage('Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Build') {
             steps {
                 sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh 'echo $PASS | docker login -u $USER --password-stdin'
-                    sh 'docker tag $IMAGE_NAME $DOCKERHUB_USER/$IMAGE_NAME:latest'
-                    sh 'docker push $DOCKERHUB_USER/$IMAGE_NAME:latest'
+                    sh 'docker tag $IMAGE_NAME sarafabhinav1997/$IMAGE_NAME:latest'
+                    sh 'docker push sarafabhinav1997/$IMAGE_NAME:latest'
                 }
             }
         }
 
-      stage('Deploy to Test Server') {
+      stage('Deploy to Test') {
             steps {
-                sh 'ansible-playbook -i ansible/inventory/test ansible/playbooks/deploy.yml'
+                sh 'scp -i $PRIVATE_KEY docker-compose.yml $TEST_SERVER:/home/ubuntu/'
+                ssh '-i $PRIVATE_KEY $TEST_SERVER "docker-compose down && docker-compose up -d"'
             }
         }
 
-        stage('Selenium Tests') {
+        stage('Selenium Test') {
             steps {
-                sh 'python3 tests/selenium_test.py'
+                sh 'pytest tests/selenium_test.py'
             }
         }
 
-        stage('Manual Approval for Prod?') {
-            steps {
-                input message: 'Promote to production?'
-            }
-        }
-   
-        stage('Deploy to Prod Server') {
+        stage('Deploy to Prod') {
             when {
-                expression {
-                    currentBuild.result == null || currentBuild.result == 'SUCCESS'
-                }
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS'}
             }
             steps {
-                sh 'ansible-playbook -i ansible/inventory/prod ansible/playbooks/deploy.yml'
+                sh 'scp -i $PRIVATE_KEY docker-compose.yml $PROD_SERVER:/home/ubuntu/'
+                sh 'ssh -i $PRIVATE_KEY $PROD_SERVER "docker-compose down && docker-compose up -d"'
             }
         }
     }
