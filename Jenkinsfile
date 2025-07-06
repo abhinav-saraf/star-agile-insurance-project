@@ -3,9 +3,6 @@ pipeline {
 
     environment {
         IMAGE_NAME = "insureme-app"
-        TEST_SERVER = "ubuntu@<test-server-ip>"
-        PROD_SERVER = "ubuntu@<prod-server-ip>"
-        PRIVATE_KEY = credentials('ec2-ssh-key')
     }
 
     stages {
