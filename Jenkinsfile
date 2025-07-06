@@ -42,7 +42,7 @@ pipeline {
 
         stage('Selenium Test') {
             steps {
-                sh 'python3 tests/selenium_test.py'
+                sh 'python3 selenium_test.py'
             }
         }
 
@@ -51,7 +51,7 @@ pipeline {
                 expression {currentBuild.result == null || currentBuild.result == 'SUCCESS'}
             }
             steps {
-                sh 'ansible-playbook -i ansible/inventory/prod ansible/deploy_app.yml'
+                sh 'ansible-playbook -i ansible/inventory/prod ansible/deploy.yml'
             }
         }
     }
