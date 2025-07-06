@@ -39,24 +39,23 @@ pipeline {
 
       stage('Deploy to Test') {
             steps {
-                sh 'scp -i $PRIVATE_KEY docker-compose.yml $TEST_SERVER:/home/ubuntu/'
-                ssh '-i $PRIVATE_KEY $TEST_SERVER "docker-compose down && docker-compose up -d"'
+                sh 'ansible-playbook -i ansible/inventory/test ansible/deploy.yml'
             }
         }
 
         stage('Selenium Test') {
             steps {
-                sh 'pytest tests/selenium_test.py'
+                sh 'python3 tests/selenium_test.py'
             }
         }
 
         stage('Deploy to Prod') {
             when {
-                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS'}
+                expression {currentBuild.result == null || currentBuild.result == 'SUCCESS'}
             }
             steps {
-                sh 'scp -i $PRIVATE_KEY docker-compose.yml $PROD_SERVER:/home/ubuntu/'
-                sh 'ssh -i $PRIVATE_KEY $PROD_SERVER "docker-compose down && docker-compose up -d"'
+                sh 'ansible-playbook -i ansible/inventory/prod ansible/deploy_app.yml'
             }
         }
     }
+}
