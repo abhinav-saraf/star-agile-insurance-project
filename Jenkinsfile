@@ -36,7 +36,7 @@ pipeline {
 
       stage('Deploy to Test') {
             steps {
-                sh 'ansible-playbook -i ansible/inventory/test ansible/deploy.yml'
+                sh 'ansible-playbook -i ansible/test ansible/deploy.yml'
             }
         }
 
@@ -51,7 +51,7 @@ pipeline {
                 expression {currentBuild.result == null || currentBuild.result == 'SUCCESS'}
             }
             steps {
-                sh 'ansible-playbook -i ansible/inventory/prod ansible/deploy.yml'
+                sh 'ansible-playbook -i ansible/prod ansible/deploy.yml'
             }
         }
     }
