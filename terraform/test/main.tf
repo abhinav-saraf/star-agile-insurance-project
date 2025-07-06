@@ -13,6 +13,11 @@ resource "aws_instance" "test" {
   }
 
   provisioner "remote-exec" {
+    command = <<EOT
+      echo "[test]
+      ${self.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=/var/lib/jenkins/.ssh/id_rsa ansible_ssh_common_args='-o StrictHostKeyChecking=no'" > /var/lib/jenkins/workspace/FinanceMe/ansible/inventory/test
+    EOT
+  }
     inline = [
       "sudo apt update",
       "sudo apt install docker.io -y"
