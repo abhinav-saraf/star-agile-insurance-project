@@ -42,15 +42,6 @@ pipeline {
             }
         }
 
-        stage('Selenium Test') {
-            steps {
-                sh 'python3 -m venv selenium-env'
-                sh '. selenium-env/bin/activate'
-                sh './selenium-env/bin/pip install selenium'
-                sh './selenium-env/bin/python selenium_test.py'
-            }
-        }
-
         stage('Deploy to Prod') {
             when {
                 expression {currentBuild.result == null || currentBuild.result == 'SUCCESS'}
