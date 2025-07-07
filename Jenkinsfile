@@ -14,13 +14,13 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Package') {
             steps {
                 sh 'mvn clean package'
             }
         }
 
-        stage('Docker Build') {
+        stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME .'
             }
