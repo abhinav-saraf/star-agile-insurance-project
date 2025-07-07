@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "insureme-app"
-        ANSIBLE_HOST_KEY_CHECKING = "False"
+ 
     }
 
     stages {
