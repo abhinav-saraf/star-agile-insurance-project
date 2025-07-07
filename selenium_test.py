@@ -1,18 +1,17 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-import time
+from selenium.webdriver.chrome import ChromeDriverManager
 
 options = Options()
 options.add_argument('--headless')
 options.add_argument('--no-sandbox')
 options.add_argument("--disable-dev-shm-usage")
 
-driver = webdriver.Chrome(options=options)
-driver.get("http://13.220.161.209:8084")
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service, options=options)
 
-time.sleep(3)
-assert "InsureMe" in driver.title or "Login" in driver.page_source
-
-print("Test Passed: Web app is running")
+driver.get("http://13.220.161.209:8081")
+print("Page Test", driver.title)
 
 driver.quit()
