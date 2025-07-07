@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "insureme-app"
- 
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -21,7 +16,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                sh 'docker build -t insureme-app .'
             }
         }
 
@@ -29,8 +24,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh 'echo $PASS | docker login -u $USER --password-stdin'
-                    sh 'docker tag $IMAGE_NAME sarafabhinav1997/$IMAGE_NAME:latest'
-                    sh 'docker push sarafabhinav1997/$IMAGE_NAME:latest'
+                    sh 'docker tag insureme-app sarafabhinav1997/insureme-app:latest'
+                    sh 'docker push sarafabhinav1997/insureme-app:latest'
                 }
             }
         }
