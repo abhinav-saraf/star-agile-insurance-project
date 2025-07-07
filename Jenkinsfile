@@ -46,8 +46,8 @@ pipeline {
             steps {
                 sh 'python3 -m venv selenium-env'
                 sh '. selenium-env/bin/activate'
-                sh 'pip install selenium'
-                sh 'python selenium_test.py'
+                sh './selenium-env/bin/pip install selenium'
+                sh './selenium-env/bin/python selenium_test.py'
             }
         }
 
